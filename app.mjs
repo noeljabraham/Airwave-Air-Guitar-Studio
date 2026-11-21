@@ -1,4 +1,5 @@
-import {instruments,shortcuts,noteName,keyStrikes,intersects,tuning,vibration} from './instrument.mjs';
+import {drawString} from './string-renderer.mjs';
+import {instruments,shortcuts,noteName,keyStrikes,intersects,tuning} from './instrument.mjs';
 
 const $=id=>document.getElementById(id);
 const canvas=document.querySelector('canvas'), video=document.querySelector('video'), ctx=canvas.getContext('2d');
@@ -136,25 +137,15 @@ function paint(){
   }
   if(voice==='Guitar'){
     const now=performance.now();
-    const drawString=([a,b],color,width,label,i)=>{
-      const age=now-flashes[i];
-      if(age>=0 && age<1400 && !reducedMotion.matches){
-        const dx=(b.x-a.x)*w,dy=(b.y-a.y)*h,length=Math.hypot(dx,dy)||1;
-        ctx.save();
-        ctx.shadowColor='#e5ff95';ctx.shadowBlur=14*Math.exp(-age/400);
-        ctx.beginPath();ctx.moveTo(a.x*w,a.y*h);ctx.strokeStyle=color;ctx.lineWidth=width;
-        for(let j=1;j<=64;j++){
-          const t=j/64,bend=vibration(t,pluckPositions[i],age);
-          ctx.lineTo(a.x*w+dx*t-dy/length*bend,a.y*h+dy*t+dx/length*bend);
-        }
-        ctx.stroke();ctx.restore();
-        if(!motionFrame)motionFrame=requestAnimationFrame(()=>{motionFrame=0;paint()});
-      }else line(a.x,a.y,b.x,b.y,color,width);
-      circle(a.x,a.y,4,color);circle(b.x,b.y,4,color);
-      ctx.fillStyle=color;ctx.fillText(label,(a.x+b.x)*w/2,(a.y+b.y)*h/2-12);
-    };
-    strings.forEach((ends,i)=>drawString(ends,performance.now()-(flashes[i]??-2000)<700?'#ffff80':'#d8efbb',2,noteName(guitarNotes[i]),i));
-    if(draft)drawString(draft,'#ffcc82',3,draftNote===undefined?'':noteName(draftNote));
+    let animating=false;
+    strings.forEach((ends,i)=>{
+      animating=drawString(ctx,ends,w,h,{
+        age:now-(flashes[i]??-2000),hit:pluckPositions[i]??.5,
+        reduced:reducedMotion.matches,label:noteName(guitarNotes[i])
+      }) || animating;
+    });
+    if(draft)drawString(ctx,draft,w,h,{draft:true,label:draftNote===undefined?'':noteName(draftNote)});
+    if(animating && !motionFrame)motionFrame=requestAnimationFrame(()=>{motionFrame=0;paint()});
     if(!strings.length && !draft){
       ctx.fillStyle='#dcf2d6';ctx.fillText(adding?'Pinch with both hands and pull apart':'Choose Add string to begin',w/2,h/2);
     }

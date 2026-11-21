@@ -57,7 +57,7 @@ def app():
     server = web.Application()
     server.router.add_get("/track", tracking)
     server.router.add_get("/", asset)
-    server.router.add_get(r"/{name:index\.html|app\.mjs|instrument\.mjs|style\.css}", asset)
+    server.router.add_get(r"/{name:index\.html|app\.mjs|instrument\.mjs|string-renderer\.mjs|style\.css}", asset)
     return server
 
 
