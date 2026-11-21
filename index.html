@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script>
+if (['127.0.0.1', 'localhost'].includes(location.hostname) && location.port === '8010') {
+  const studio = new URL(location.href);
+  studio.port = '8011';
+  location.replace(studio);
+}
+</script><title>Airwave · Instrument studio</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="brand"><i aria-hidden="true">∿</i> Airwave</div><span>GESTURE INSTRUMENT STUDIO</span></header>
+<main><div class="heading"><div><h1>Playing room</h1><p>Make music with your hands, mouse, or keyboard.</p></div><button id="camera">Enable camera</button></div>
+<p id="status" role="status">Camera off. Drag on the surface to place your first string.</p>
+<div class="layout"><section class="monitor" aria-label="Instrument playing surface"><div class="strip"><b><i class="dot"></i> PLAY SURFACE</b><span id="mode">MANUAL INPUT</span></div>
+<div id="stage"><video muted playsinline></video><canvas aria-label="Interactive instrument. Use the note buttons below for keyboard access."></canvas></div>
+<div class="strip bottom"><span id="layoutName"></span><button type="button" id="addString">Pause drawing</button><button type="button" id="resetStrings">Reset strings</button><span id="last">NOTE &nbsp; —</span></div></section>
+<aside><h2>Instrument rack</h2><div id="rack"></div><label for="height">Playing height</label><input id="height" type="range" min="-15" max="15" value="0"><label for="volume">Output volume</label><input id="volume" type="range" min="0" max="100" value="65"></aside></div>
+<section class="controls"><div><h2>Play notes</h2><p id="guide"></p></div><div id="pads"></div></section></main>
+<script type="module" src="app.mjs"></script></body></html>

@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {keyStrikes,noteName,intersects,tuning} from './instrument.mjs';
+const segment=(x,y,u,v)=>[{x,y},{x:u,y:v}];
+const horizontal=segment(.1,.3,.9,.3);
+assert.ok(intersects(horizontal,segment(.5,0,.5,1)));
+assert.ok(intersects(horizontal,segment(.2,.3,.6,.3)));
+assert.ok(intersects(horizontal,segment(.9,.3,1,.8)));
+assert.ok(!intersects(horizontal,segment(.1,.32,.9,.32)));
+assert.ok(!intersects(horizontal,segment(.91,.3,1,.3)));
+const low=tuning(horizontal,[],1.5);
+assert.ok(tuning(segment(.1,.5,.3,.5),[low],1.5)>low);
+assert.notEqual(tuning(horizontal,[low],1.5),low);
+const hand={};
+const tap=y=>keyStrikes(hand,.85,y,.1);
+assert.deepEqual(tap(.6),[]);
+assert.deepEqual(tap(.49),[]);
+assert.deepEqual(tap(.56),[7]);
+assert.deepEqual(tap(.57),[]);
+assert.equal(noteName(40),'E2');
+
+const {vibration}=await import('./instrument.mjs');
+assert.equal(vibration(0,.3,0),0);
+assert.equal(vibration(1,.3,0),0);
+assert.ok(vibration(.3,.3,0)>vibration(.9,.3,0));
+assert.ok(vibration(.3,.3,60)<0);
+assert.equal(vibration(.3,.3,1400),0);
